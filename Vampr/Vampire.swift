@@ -34,23 +34,35 @@ class Vampire {
   
   /// Adds the vampire as an offspring of this vampire
   func add(offspring: Vampire) {
-  
+    let newVampire = offspring
+    newVampire.creator = self
+  self.offspring.append(newVampire)
   }
   
   /// The total number of vampires created by that vampire
   var numberOfOffspring: Int {
-    return -1
+    return self.offspring.count
   }
   
   /// Returns the number of vampires away from the original vampire this vampire is
   var numberOfVampiresFromOriginal: Int {
-    return -1
+    var numberFromOriginal = 0
+    if let isNotRoot = self.creator {
+      numberFromOriginal += 1
+      numberFromOriginal += isNotRoot.numberOfVampiresFromOriginal
+    }
+      return numberFromOriginal
   }
   
   /// Returns true if this vampire is more senior than the other vampire. (Who is closer to the original vampire)
   func isMoreSenior(than vampire: Vampire) -> Bool {
-    return false
+    if (self.numberOfVampiresFromOriginal < vampire.numberOfVampiresFromOriginal) {
+      return true
+    }
+    else {
+      return false
   }
+}
   
   // MARK: Stretch 
   
@@ -63,6 +75,35 @@ class Vampire {
       * when comparing Ansel and Andrew, Ansel is the closest common anscestor.
    */
   func closestCommonAncestor(vampire: Vampire) -> Vampire {
-    return vampire
+    var vampA = self
+    var vampB = vampire
+    if vampA === vampB {
+      return vampA 
+    }
+    if vampA === vampB.creator {
+      return vampA
+    }
+    if vampB === vampA.creator {
+      return vampB
+    }
+    if vampA.creator === vampB.creator {
+      return vampA.creator!
+    }
+      guard vampA.numberOfVampiresFromOriginal == vampB.numberOfVampiresFromOriginal else {
+        if vampA.numberOfVampiresFromOriginal > vampB.numberOfVampiresFromOriginal {
+        vampA = vampA.creator!
+          return vampA.closestCommonAncestor(vampire: vampB)
+      }
+        else {
+          vampB = vampB.creator!
+          return vampA.closestCommonAncestor(vampire:vampB)
+        }
+    }
+    vampA = vampA.creator!
+    vampB = vampB.creator!
+    return vampA.closestCommonAncestor(vampire:vampB)
+    
+    
   }
 }
+
